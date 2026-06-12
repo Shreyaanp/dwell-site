@@ -21,7 +21,7 @@ Mobile API requests should include:
 
 ```bash
 X-Dwell-Install-Id: <stable app install id>
-Authorization: Bearer <google id token> # optional until auth verification is wired
+Authorization: Bearer <google id token> # required for verified Google sessions
 ```
 
 ## Development
@@ -51,4 +51,10 @@ Copy `.env.example` to `.env.local` and add MongoDB access when available:
 ```bash
 MONGODB_URI=mongodb+srv://...
 MONGODB_DB=dwell
+GOOGLE_SERVER_CLIENT_ID=<server-oauth-client-id>.apps.googleusercontent.com
 ```
+
+For Google sign-in, keep both OAuth clients in the same Google Cloud project:
+
+- Android client: package `work.shreyaan.dwell` plus the app signing SHA-1.
+- Server client: its client ID goes in `GOOGLE_SERVER_CLIENT_ID` for this backend and the Android app's `local.properties`. Google Cloud may show this as an OAuth client of type "Web application"; it is used as the backend audience for ID-token verification, not as a web login flow.

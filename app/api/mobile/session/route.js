@@ -1,5 +1,6 @@
 import { getDatabase } from "../../../../lib/mongodb";
 import { cleanString, jsonError, jsonOk, readIdentity, readJson } from "../../../../lib/api";
+import { verifyGoogleIdToken } from "../../../../lib/google-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,10 +11,23 @@ export async function POST(request) {
 
   const body = (await readJson(request)) || {};
   const now = new Date();
-  const provider = cleanString(body.provider || "local", 32) || "local";
-  const displayName = cleanString(body.displayName, 120);
-  const email = cleanString(body.email, 160).toLowerCase();
-  const googleSubject = cleanString(body.googleSubject, 128);
+  let provider = cleanString(body.provider || "local", 32) || "local";
+  let displayName = cleanString(body.displayName, 120);
+  let email = cleanString(body.email, 160).toLowerCase();
+  let googleSubject = cleanString(body.googleSubject, 128);
+  const googleIdToken = cleanString(body.googleIdToken, 4096) || identity.bearerToken;
+
+  if (provider === "google" || googleIdToken) {
+    try {
+      const verified = await verifyGoogleIdToken(googleIdToken);
+      provider = "google";
+      displayName = verified.displayName || displayName;
+      email = verified.email.toLowerCase() || email;
+      googleSubject = verified.googleSubject;
+    } catch (err) {
+      return jsonError(err.message || "Google sign-in failed.", err.status || 401);
+    }
+  }
 
   try {
     const database = await getDatabase();
