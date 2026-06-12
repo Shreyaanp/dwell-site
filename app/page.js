@@ -1,4 +1,26 @@
 import Link from "next/link";
+import { site } from "../lib/site";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  name: site.name,
+  description: site.description,
+  url: site.url,
+  operatingSystem: "Android, Wear OS",
+  applicationCategory: "UtilitiesApplication",
+  author: {
+    "@type": "Person",
+    name: site.author.name,
+    url: site.author.url,
+  },
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  privacyPolicy: `${site.url}/privacy`,
+};
 
 function TimerBadge() {
   return (
@@ -14,6 +36,12 @@ function TimerBadge() {
 export default function HomePage() {
   return (
     <main className="home-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
       <section className="home-content" aria-labelledby="dwell-title">
         <TimerBadge />
         <h1 id="dwell-title">Dwell</h1>
@@ -32,8 +60,8 @@ export default function HomePage() {
         </Link>
         <footer>
           Built by{" "}
-          <a href="https://www.shreyaan.work/" rel="noreferrer">
-            Shreyaan Pradhan
+          <a href={site.author.url} rel="noopener noreferrer">
+            {site.author.name}
           </a>{" "}
           · Android &amp; Wear OS
         </footer>

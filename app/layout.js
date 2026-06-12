@@ -1,22 +1,88 @@
 import "./globals.css";
+import { site } from "../lib/site";
 
-const siteUrl = "https://dwell.shreyaan.work";
-const description =
-  "Dwell is an Android and Wear OS app that automatically starts a countdown timer when you arrive at a place you choose on the map.";
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "dark",
+  themeColor: "#0e1116",
+};
 
 export const metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(site.url),
+  applicationName: site.name,
   title: {
     default: "Dwell - arrive, and the timer starts",
-    template: "%s | Dwell",
+    template: `%s | ${site.name}`,
   },
-  description,
+  description: site.description,
+  keywords: site.keywords,
+  authors: [
+    {
+      name: site.author.name,
+      url: site.author.url,
+    },
+  ],
+  creator: site.author.name,
+  publisher: site.author.name,
+  category: "Productivity",
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
+        url: "/icon",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/favicon.svg",
+    apple: [
+      {
+        url: "/apple-icon",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "Dwell",
-    description,
-    url: siteUrl,
-    siteName: "Dwell",
+    title: site.name,
+    description: site.description,
+    url: "/",
+    siteName: site.name,
+    locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Dwell app preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.name,
+    description: site.description,
+    images: ["/twitter-image"],
   },
 };
 

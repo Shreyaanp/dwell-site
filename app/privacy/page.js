@@ -1,8 +1,17 @@
 import Link from "next/link";
+import { site } from "../../lib/site";
 
 export const metadata = {
   title: "Privacy Policy",
-  description: "Privacy policy for Dwell on Android and Wear OS.",
+  description: `Privacy policy for ${site.name} on Android and Wear OS.`,
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: `${site.name} Privacy Policy`,
+    description: `Privacy policy for ${site.name} on Android and Wear OS.`,
+    url: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {
