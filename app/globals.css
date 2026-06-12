@@ -109,6 +109,12 @@ h1 {
   outline: none;
 }
 
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 footer {
   margin-top: 40px;
   color: var(--dim);
@@ -153,6 +159,73 @@ footer a {
 
 .privacy-content a {
   color: var(--accent-soft);
+}
+
+.notice {
+  margin: 20px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(138, 180, 248, 0.4);
+  border-radius: 8px;
+  background: rgba(26, 115, 232, 0.14);
+  color: var(--text);
+}
+
+.deletion-form {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 32px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.deletion-form fieldset {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.deletion-form legend {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.deletion-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--soft);
+}
+
+.deletion-form fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deletion-form input,
+.deletion-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0e1116;
+  color: var(--text);
+  font: inherit;
+  padding: 11px 12px;
+}
+
+.deletion-form input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+
+.deletion-form input:focus,
+.deletion-form textarea:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 .meta {

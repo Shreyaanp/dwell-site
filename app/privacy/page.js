@@ -27,23 +27,34 @@ export default function PrivacyPage() {
         <p>
           Dwell is a timer app that starts a countdown when your phone detects you have arrived at a
           place you chose on a map. This policy describes what data the app uses and what happens to
-          it. The short version: <strong>your app data stays on your device.</strong> Dwell requires
-          no account, and the Android/Wear OS app does not send your location, chosen place, or timer
-          history to us.
+          it. Dwell can be used with a local session or Google sign-in, and may sync saved zone and
+          product analytics data to Dwell's backend so the app can support account features and
+          diagnostics.
         </p>
 
         <h2>Location</h2>
         <p>
-          Dwell uses your device's <strong>precise location</strong> for one purpose: detecting when
-          you enter or leave the area you pinned on the map. Geofence monitoring is performed on your
-          device by Android's Google Play services. Dwell asks for "Allow all the time" location
-          access so this detection works while the app is closed.
+          Dwell uses your device's <strong>precise location</strong> for detecting when you enter or
+          leave the area you selected on the map. Geofence monitoring is performed on your device by
+          Android's Google Play services. Dwell asks for "Allow all the time" location access so this
+          detection works while the app is closed.
         </p>
         <ul>
-          <li>Your location is <strong>never transmitted</strong> to the developer or to any server operated by us.</li>
-          <li>Your chosen place, radius, and timer settings are stored only in the app's private storage on your phone.</li>
-          <li>Uninstalling the app deletes all of it.</li>
+          <li>Your current live GPS position is used by the app to center the map and evaluate the geofence.</li>
+          <li>
+            If you save a zone, Dwell may store the selected place coordinates, radius, timer
+            duration, and armed status on Dwell's backend.
+          </li>
+          <li>You can delete saved app data or delete your account from the app settings.</li>
         </ul>
+
+        <h2>Account and analytics data</h2>
+        <p>
+          Dwell may store a local app install ID, account/session details, saved geofence zones, and
+          lightweight analytics events such as app opened, location searched, geofence armed, timer
+          started, and timer cancelled. These events help us understand whether the product flow is
+          working. Dwell does not sell personal data or use advertising SDKs.
+        </p>
 
         <h2>Map tiles</h2>
         <p>
@@ -66,11 +77,18 @@ export default function PrivacyPage() {
 
         <h2>What we do not do</h2>
         <ul>
-          <li>No accounts, sign-in, or personal identifiers</li>
-          <li>No analytics, tracking, or advertising SDKs</li>
+          <li>No selling personal data</li>
+          <li>No advertising SDKs</li>
           <li>No selling or sharing of data with third parties</li>
-          <li>No location or timer data collection by the developer</li>
+          <li>No upload of continuous/live location tracks</li>
         </ul>
+
+        <h2>Data deletion</h2>
+        <p>
+          You can request deletion of app data without deleting your account, or request deletion of
+          your account and associated app data. Use the in-app Settings screen or visit{" "}
+          <Link href="/data-deletion">Dwell data deletion</Link>.
+        </p>
 
         <h2>Children</h2>
         <p>Dwell is a general-audience utility and is not directed at children under 13.</p>

@@ -53,11 +53,16 @@ export default function HomePage() {
           <li>Geofence-triggered countdown, default 4.5 hours</li>
           <li>Live countdown on your Wear OS watch</li>
           <li>Asks before cancelling if you leave early</li>
-          <li>Everything stays on your device</li>
+          <li>Privacy controls for deleting app data or account data</li>
         </ul>
-        <Link className="button-link" href="/privacy">
-          Privacy policy
-        </Link>
+        <div className="button-row">
+          <Link className="button-link" href="/privacy">
+            Privacy policy
+          </Link>
+          <Link className="button-link" href="/data-deletion">
+            Data deletion
+          </Link>
+        </div>
         <footer>
           Built by{" "}
           <a href={site.author.url} rel="noopener noreferrer">

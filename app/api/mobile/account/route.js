@@ -1,0 +1,32 @@
+import { getDatabase } from "../../../../lib/mongodb";
+import { jsonError, jsonOk, readIdentity } from "../../../../lib/api";
+import { deleteInstallData, recordDeletionRequest } from "../../../../lib/deletion";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function DELETE(request) {
+  const { identity, error } = readIdentity(request);
+  if (error) return error;
+
+  try {
+    const database = await getDatabase();
+    const result = await deleteInstallData(database, identity.installId, {
+      deleteAccount: true,
+    });
+    await recordDeletionRequest(database, {
+      source: "mobile_api",
+      requestType: "delete_account",
+      installId: identity.installId,
+      status: "completed",
+      result,
+    });
+
+    return jsonOk({
+      deleted: result,
+      kept: ["deletion request record for up to 30 days"],
+    });
+  } catch (err) {
+    return jsonError("Unable to delete account.", 503, { detail: err.message });
+  }
+}
