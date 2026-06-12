@@ -1,9 +1,28 @@
 import { getDatabase } from "../../../../lib/mongodb";
-import { cleanString, jsonError, jsonOk, readIdentity, readJson } from "../../../../lib/api";
+import { jsonError, jsonOk, readIdentity, readJson } from "../../../../lib/api";
 import { verifyGoogleIdToken } from "../../../../lib/google-auth";
+import {
+  applyVerifiedGoogleSession,
+  buildUserUpdate,
+  normalizeSessionInput,
+  resolveUserFilter,
+  setupUserIndexes,
+} from "../../../../lib/session.js";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+let userIndexesPromise;
+
+function ensureUserIndexes(users) {
+  if (!userIndexesPromise) {
+    userIndexesPromise = setupUserIndexes(users).catch((err) => {
+      userIndexesPromise = null;
+      throw err;
+    });
+  }
+  return userIndexesPromise;
+}
 
 export async function POST(request) {
   const { identity, error } = readIdentity(request);
@@ -11,19 +30,14 @@ export async function POST(request) {
 
   const body = (await readJson(request)) || {};
   const now = new Date();
-  let provider = cleanString(body.provider || "local", 32) || "local";
-  let displayName = cleanString(body.displayName, 120);
-  let email = cleanString(body.email, 160).toLowerCase();
-  let googleSubject = cleanString(body.googleSubject, 128);
-  const googleIdToken = cleanString(body.googleIdToken, 4096) || identity.bearerToken;
+  let session = normalizeSessionInput(body, identity);
 
-  if (provider === "google" || googleIdToken) {
+  if (session.provider === "google" || session.googleIdToken) {
     try {
-      const verified = await verifyGoogleIdToken(googleIdToken);
-      provider = "google";
-      displayName = verified.displayName || displayName;
-      email = verified.email.toLowerCase() || email;
-      googleSubject = verified.googleSubject;
+      session = applyVerifiedGoogleSession(
+        session,
+        await verifyGoogleIdToken(session.googleIdToken),
+      );
     } catch (err) {
       return jsonError(err.message || "Google sign-in failed.", err.status || 401);
     }
@@ -32,27 +46,12 @@ export async function POST(request) {
   try {
     const database = await getDatabase();
     const users = database.collection("users");
-    await users.createIndex({ installId: 1 }, { unique: true });
-    await users.createIndex({ googleSubject: 1 }, { sparse: true });
-
-    const update = {
-      $set: {
-        provider,
-        displayName,
-        email,
-        googleSubject,
-        hasBearerToken: Boolean(identity.bearerToken),
-        lastSeenAt: now,
-        updatedAt: now,
-      },
-      $setOnInsert: {
-        installId: identity.installId,
-        createdAt: now,
-      },
-    };
+    await ensureUserIndexes(users);
+    const userFilter = await resolveUserFilter(users, session, identity);
+    const update = buildUserUpdate(session, identity, now);
 
     const result = await users.findOneAndUpdate(
-      { installId: identity.installId },
+      userFilter,
       update,
       {
         upsert: true,
@@ -64,6 +63,7 @@ export async function POST(request) {
           displayName: 1,
           email: 1,
           googleSubject: 1,
+          installIds: 1,
           createdAt: 1,
           updatedAt: 1,
           lastSeenAt: 1,

@@ -2,11 +2,13 @@
   "name": "dwell-site",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "next build"
+    "check": "next build",
+    "test": "node --test"
   },
   "dependencies": {
     "google-auth-library": "^10.7.0",

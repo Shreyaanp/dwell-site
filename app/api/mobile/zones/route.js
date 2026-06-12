@@ -7,18 +7,19 @@ import {
   readIdentity,
   readJson,
 } from "../../../../lib/api";
+import { resolveLinkedInstallScope } from "../../../../lib/ownership";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const PRIMARY_ZONE_ID = "primary";
 
-async function zonesCollection() {
+async function zonesContext() {
   const database = await getDatabase();
   const zones = database.collection("zones");
   await zones.createIndex({ installId: 1, zoneId: 1 }, { unique: true });
   await zones.createIndex({ installId: 1, updatedAt: -1 });
-  return zones;
+  return { database, zones };
 }
 
 export async function GET(request) {
@@ -26,10 +27,11 @@ export async function GET(request) {
   if (error) return error;
 
   try {
-    const zones = await zonesCollection();
+    const { database, zones } = await zonesContext();
+    const { dataFilter } = await resolveLinkedInstallScope(database, identity.installId);
     const items = await zones
       .find(
-        { installId: identity.installId },
+        dataFilter,
         {
           projection: {
             _id: 0,
@@ -55,7 +57,7 @@ export async function PUT(request) {
   const label = cleanString(body.label || "Primary zone", 160) || "Primary zone";
   const lat = numberInRange(body.lat, -90, 90);
   const lon = numberInRange(body.lon, -180, 180);
-  const radiusMeters = numberInRange(body.radiusMeters, 25, 5000);
+  const radiusMeters = numberInRange(body.radiusMeters, 50, 500);
   const durationMinutes = numberInRange(body.durationMinutes, 1, 2880);
   const armed = Boolean(body.armed);
 
@@ -66,10 +68,11 @@ export async function PUT(request) {
   const now = new Date();
 
   try {
-    const zones = await zonesCollection();
+    const { database, zones } = await zonesContext();
+    const { canonicalInstallId } = await resolveLinkedInstallScope(database, identity.installId);
     const result = await zones.findOneAndUpdate(
       {
-        installId: identity.installId,
+        installId: canonicalInstallId,
         zoneId: PRIMARY_ZONE_ID,
       },
       {
@@ -84,7 +87,7 @@ export async function PUT(request) {
           updatedAt: now,
         },
         $setOnInsert: {
-          installId: identity.installId,
+          installId: canonicalInstallId,
           createdAt: now,
         },
       },
@@ -109,9 +112,10 @@ export async function DELETE(request) {
   if (error) return error;
 
   try {
-    const zones = await zonesCollection();
-    await zones.deleteOne({
-      installId: identity.installId,
+    const { database, zones } = await zonesContext();
+    const { dataFilter } = await resolveLinkedInstallScope(database, identity.installId);
+    await zones.deleteMany({
+      ...dataFilter,
       zoneId: PRIMARY_ZONE_ID,
     });
 

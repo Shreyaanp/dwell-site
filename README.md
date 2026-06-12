@@ -21,8 +21,12 @@ Mobile API requests should include:
 
 ```bash
 X-Dwell-Install-Id: <stable app install id>
-Authorization: Bearer <google id token> # required for verified Google sessions
 ```
+
+For Google sign-in, the Android app sends the Credential Manager ID token to
+`/api/mobile/session` as `googleIdToken`. The backend verifies that token and
+links all installs on the same Google account; `/api/mobile/zones` loads and
+updates the primary zone across those linked installs.
 
 ## Development
 
