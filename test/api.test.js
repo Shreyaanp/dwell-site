@@ -6,6 +6,7 @@ import {
   numberInRange,
   parseIdentityHeaders,
 } from "../lib/api-core.js";
+import { mobileConfigFromEnv } from "../lib/mobile-config.js";
 
 function requestWithHeaders(headers) {
   return new Request("https://dwell.example/api/mobile/session", { headers }).headers;
@@ -53,4 +54,30 @@ test("dateFromClient falls back for invalid timestamps", () => {
   const after = Date.now();
   assert.ok(fallback.getTime() >= before);
   assert.ok(fallback.getTime() <= after);
+});
+
+test("mobile config exposes a switchable non-autocomplete search provider", () => {
+  const config = mobileConfigFromEnv({
+    DWELL_MAP_STYLE_URL: "https://maps.example.test/styles/liberty/",
+    DWELL_MAP_ATTRIBUTION_LABEL: "Example Maps | OpenStreetMap",
+    DWELL_SEARCH_BASE_URL: "https://search.example.test/",
+    DWELL_SEARCH_USER_AGENT: "DwellTest/1.2 (+https://example.test)",
+  });
+
+  assert.deepEqual(config, {
+    map: {
+      provider: "maplibre",
+      styleUrl: "https://maps.example.test/styles/liberty",
+      attributionLabel: "Example Maps | OpenStreetMap",
+    },
+    search: {
+      provider: "nominatim",
+      baseUrl: "https://search.example.test",
+      userAgent: "DwellTest/1.2 (+https://example.test)",
+      autocomplete: false,
+      minQueryLength: 3,
+      networkCooldownMs: 1500,
+      cacheTtlMs: 1800000,
+    },
+  });
 });
